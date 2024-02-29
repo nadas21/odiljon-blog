@@ -1,10 +1,39 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./register.css";
 import { FaGooglePlusG } from "react-icons/fa";
-
+import {provider,auth} from "./googleConfig"
+import { signInWithPopup } from "firebase/auth";
 
 export const Register = () => {
 
+  
+const navigate = useNavigate()
+
+  const handleClick = async () => {
+  await signInWithPopup(auth, provider).then ((data) => {
+    localStorage.setItem("token", data.user.accessToken)
+  fetch(`https://bloguz.onrender.com/register`,{
+    method: "POST",
+    headers:{
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      fullName:data.user.displayName ,
+      email : data.user.email,
+      profilePhoto: data.user.photoURL
+    })
+  })
+  .then((res) => res.json())
+  .then((info) => {
+    if(info.msg === "Registered"){
+      navigate("/")
+    }else if (info.msg === "user already exists"){
+      navigate("/")
+    }
+    alert(info.msg)
+  })
+  })
+  };
 
   return (
     <div className="container">
@@ -56,7 +85,7 @@ export const Register = () => {
             Sign in
           </NavLink>
         </p>
-        <button  className="google-button">
+        <button  className="google-button" onClick={handleClick}>
           <FaGooglePlusG className="google-icon" /> Sign up with google
         </button>
       </div>

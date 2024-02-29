@@ -20,7 +20,6 @@ import "react-toastify/dist/ReactToastify.css";
 export const AdminContact = () => {
   const [contact, setContact] = useState([]);
 
-  ///////////////// modal
   const [anchorSecond, setAnchorSecond] = useState(null);
 
   const handleClickSecond = (event) => {

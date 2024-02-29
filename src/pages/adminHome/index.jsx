@@ -8,7 +8,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { styled } from "@mui/material/styles";
+// import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import { MdCloudUpload } from "react-icons/md";
 import { AdminNews } from "../../components/addNews";
@@ -16,165 +16,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export const AdminHome = () => {
-  const [img, setImg] = useState(null);
-  const [slideList, setSlideList] = useState([]);
-  const [post, setPost] = useState([]);
-
-  /////////////////////// create slide
-  const handleImg = (e) => {
-    setImg(e.target.files[0]);
-  };
-
-  const formData = new FormData();
-  formData.append("file", img);
-  formData.append("upload_preset", "blog-preset");
-
-  const handleData = async (e) => {
-    e.preventDefault();
-
-    fetch("https://api.cloudinary.com/v1_1/dxealoh68/image/upload", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        {
-          fetch(import.meta.env.VITE_APP_BASE_URL + "/create_slide", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              token: sessionStorage.getItem("admin"),
-            },
-            body: JSON.stringify({
-              img: data.url,
-            }),
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              if (data?.message === "created slide") {
-                toast.info(data?.message, {
-                  position: "top-right",
-                  autoClose: 2000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  theme: "light",
-                });
-                setTimeout(() => {
-                  location.reload();
-                }, 2500);
-              }
-            })
-            .catch((error) => console.log(error));
-        }
-      });
-  };
-
-  //////////////////////////////// get slide
-
-  useEffect(() => {
-    fetch(import.meta.env.VITE_APP_BASE_URL + `/slide`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => setSlideList(data))
-      .catch((error) => console.log(error));
-  }, []);
-
-  ///////////////////////// delete slide
-
-  const handleDelete = (e) => {
-    fetch(import.meta.env.VITE_APP_BASE_URL + "/delete_slide/" + e, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        token: sessionStorage.getItem("admin"),
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.msg === "deleted slide!") {
-          setTimeout(() => {
-            location.reload();
-          }, 2500);
-        }
-        toast.info(data.msg, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      })
-      .catch((error) => console.log(error));
-  };
-
-  ///////////////////////// get posts
-
-  useEffect(() => {
-    fetch(import.meta.env.VITE_APP_BASE_URL + `/posts?page=1&limit=1000`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setPost(data.results);
-      })
-      .catch((err) => console.log(err));
-  }, []);
-
-  //////////////////////////////////////// delete post
-  const postDelete = (e) => {
-    fetch(import.meta.env.VITE_APP_BASE_URL + "/delete_post/" + e, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        token: sessionStorage.getItem("admin"),
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.msg === "deleted post!") {
-          setTimeout(() => {
-            location.reload()
-          },2500)
-        }
-        toast.info(data.msg, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      })
-      .catch((error) => console.log(error));
-  };
-
-  const VisuallyHiddenInput = styled("input")({
-    clip: "rect(0 0 0 0)",
-    clipPath: "inset(50%)",
-    height: 1,
-    overflow: "hidden",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    whiteSpace: "nowrap",
-    width: 1,
-  });
-
+  
   return (
     <div className="admin-home">
       <div className="container">
@@ -187,17 +29,17 @@ export const AdminHome = () => {
               variant="contained"
               className="admin-home-add"
               startIcon={<MdCloudUpload />}
-              onChange={(e) => handleImg(e)}
+             
             >
               Upload file
               <VisuallyHiddenInput type="file" />
             </Button>
-            <button className="admin-home-add-btn" onClick={handleData}>
+            <button className="admin-home-add-btn">
               qo'shish
             </button>
           </div>
         </div>
-        <TableContainer component={Paper} className="admin-home-table">
+        <TableContainer  className="admin-home-table">
           <h2 className="admin-home-title-bottom">Slidelarni boshqarish</h2>
           <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
             <TableHead>
@@ -211,11 +53,10 @@ export const AdminHome = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {slideList.length &&
-                slideList.map((item) => (
+           
                   <TableRow
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    key={item.id}
+                 
                     className="admin-contact-row"
                   >
                     <TableCell className="admin-home-body" align="right">
@@ -230,11 +71,10 @@ export const AdminHome = () => {
                     <TableCell className="admin-home-body" align="right">
                       <RiDeleteBin6Fill
                         className="admin-home-delete"
-                        onClick={() => handleDelete(item.id)}
+                     
                       />
                     </TableCell>
                   </TableRow>
-                ))}
             </TableBody>
           </Table>
         </TableContainer>

@@ -1,61 +1,66 @@
 import { NavLink } from "react-router-dom";
 import "./login.css";
-import { auth, provider } from "../register/googleConfig";
+// import { auth, provider } from "../register/googleConfig";
 import { signInWithPopup } from "firebase/auth";
 import { FaGooglePlusG } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import {auth, provider} from "../register/googleConfig"
 
 export const Login = () => {
-  const navigate = useNavigate();
 
-  const [email, setEmail] = useState("")
-
+  const navigate = useNavigate()
+ const [email,setEmail] = useState("")
   const handleClick = async () => {
-    await signInWithPopup(auth, provider).then((data) => {
-      fetch(import.meta.env.VITE_APP_BASE_URL + "/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: data.user.email
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          alert(data.msg);
-          if(data.token) {
-            localStorage.setItem("token", data.token)
-            navigate("/")
-          }
-          if(data.verifyAdmin !== null){
-            sessionStorage.setItem("admin", data.verifyAdmin)
-            navigate("/admin-page-scret-control/admin-home")
-          }
-        });
-    });
+  await signInWithPopup(auth, provider).then ((data) => {
+  fetch(`https://bloguz.onrender.com/login`,{
+    method: "POST",
+    headers:{
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email : data.user.email,
+    })
+  })
+  .then((res) => res.json())
+  .then((info) =>  { 
+    if (info.token) {
+      localStorage.setItem("admin", info.token)
+    }if (info.verifAdmin !== null) {
+      localStorage.setItem("admin", info.verifAdmin)
+      navigate("/admin")
+    }
+    if (info.verifAdmin === null) {
+      navigate("/")
+    }
+  });
+  });
   };
 
-  const handleLogin = () => {
-      fetch(import.meta.env.VITE_APP_BASE_URL + "/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email
-        }),
+
+
+  const Login = async () => {
+    fetch(`https://bloguz.onrender.com/login`,{
+      method: "POST",
+      headers:{
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
       })
-        .then((res) => res.json())
-        .then((data) => {
-          alert(data.msg);
-          if(data.token) {
-            localStorage.setItem("token", data.token)
-            navigate("/")
-          }
-        });
-  };
+    })
+    .then((res) => res.json())
+    .then((info) =>  { if (info.token) {
+      localStorage.setItem("token", info.token)
+    }if (info.verifAdmin !== null) {
+      localStorage.setItem("admin", info.verifAdmin)
+      navigate("/admin")
+    }
+    if (info.verifAdmin === null) {
+      navigate("/")
+    }});
+    };
+
 
   return (
     <div className="container">
@@ -77,7 +82,7 @@ export const Login = () => {
               placeholder="Email..."
               name="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e)  => setEmail(e.target.value)}
             />
           </fieldset>
           <fieldset className="fieldset">
@@ -98,8 +103,10 @@ export const Login = () => {
             </NavLink>
           </p>
           <div className="register-btn-box">
-            <button className="register-btn" onClick={handleLogin}>Ro'yxatdan o'tish</button>
-            <button onClick={handleClick} className="google-button">
+            <button className="register-btn" onClick={Login} >
+              Ro'yxatdan o'tish
+              </button>
+            <button  className="google-button"  onClick={handleClick}>
               <FaGooglePlusG className="google-icon" /> Sign in with google
             </button>
           </div>
